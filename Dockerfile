@@ -7,6 +7,7 @@ COPY . /env
 COPY . /start.sh
 
 RUN pip install .
+RUN chmod +x /start.sh
 
 RUN useradd --create-home appuser
 USER appuser
