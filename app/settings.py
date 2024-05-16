@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     database_url: str
 
     # AUTH
+    environment: str
     host: str
     secret_key: str
     algorithm: str = "HS256"
