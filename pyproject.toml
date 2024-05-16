@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "career-tracker"
+version = "0.1.0"
+authors = ["Avtakhov <avtahovfarit@gmail.com>"]
+description = "Tg bot + server"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.110.1"
+uvicorn = "^0.23.1"
+psycopg2 = "^2.9.6"
+python-jose = "^3.3.0"
+python-multipart = "^0.0.6"
+sqladmin = "^0.14.0"
+itsdangerous = "^2.1.2"
+pydantic = "*"
+alembic = "^1.11.2"
+asyncpg = "^0.28.0"
+sqlalchemy="*"
+pydantic-settings="*"
+python-telegram-bot="*"
+openpyxl="*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
