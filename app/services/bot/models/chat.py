@@ -10,4 +10,4 @@ class Chat(Base):
     )
 
     telegram_user_id = sqla.Column(sqla.BigInteger, nullable=False, primary_key=True)
-    user_id = sqla.Column(sqla.BigInteger, sqla.ForeignKey('users.user_id'), nullable=False)
+    user_id = sqla.Column(sqla.BigInteger, sqla.ForeignKey('users.user_id', ondelete="cascade"), nullable=False)

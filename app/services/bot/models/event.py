@@ -10,7 +10,7 @@ class Event(Base):
     event_name = sqla.Column(sqla.String, nullable=False)
     description = sqla.Column(sqla.String, nullable=False)
     date = sqla.Column(sqla.Date, nullable=False)
-    group_name = sqla.Column(sqla.String, sqla.ForeignKey('groups.group_name'), nullable=False)
+    group_name = sqla.Column(sqla.String, sqla.ForeignKey('groups.group_name', ondelete="cascade"), nullable=False)
 
     __table_args__ = (
         sqla.Index('date_index', 'date'),

@@ -21,6 +21,7 @@ sqlalchemy="*"
 pydantic-settings="*"
 python-telegram-bot="*"
 openpyxl="*"
+wtforms-sqlalchemy="*"
 
 [build-system]
 requires = ["poetry-core"]

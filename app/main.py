@@ -6,6 +6,7 @@ from sqladmin import Admin
 from telegram import Update
 from telegram.ext import ApplicationBuilder
 
+from .core.admin.auth import AdminAuth
 from .core.db.base import get_engine
 from .services.admin.config import admin_views
 from .services.bot.config import bot_handlers
@@ -14,7 +15,6 @@ from .settings import settings
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await ptb.bot.setWebhook(settings.webhook_url)
     async with ptb:
         await ptb.start()
         yield
@@ -25,6 +25,7 @@ app = FastAPI(lifespan=lifespan)
 admin = Admin(
     app,
     get_engine(),
+    authentication_backend=AdminAuth(settings.secret_key)
 )
 for item in admin_views:
     admin.add_view(item)

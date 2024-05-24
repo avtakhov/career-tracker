@@ -5,6 +5,7 @@ import sqlalchemy as sqla
 
 from app.core.db.base import async_session
 from .models import *
+from .views.common import get_user_groups
 
 
 async def get_known_user(telegram_user_id: int, session: AsyncSession):
@@ -41,7 +42,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     async with async_session() as session:
         known = await get_known_user(update.effective_user.id, session)
         if known is not None:
-            await update.message.reply_text(f"Снова здравствуй, {known.full_name}")
+            groups = await get_user_groups(known.user_id, session)
+            await update.message.reply_text(f"Снова здравствуй, {known.full_name}.\nГруппы: {', '.join(groups)}.")
             return
 
         new_user = await get_new_user(update.effective_user.username, session)
@@ -51,6 +53,5 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         await insert_new_chat(update.effective_user.id, new_user.user_id, session)
         await session.commit()
-        await update.message.reply_text(f"Привет, {new_user.full_name}!")
-        #обьявить пользователю его группу "привет "имя", ты в такой-то группе
-
+        groups = await get_user_groups(new_user.user_id, session)
+        await update.message.reply_text(f"Привет, {new_user.full_name}!\nГруппы: {', '.join(groups)}.")

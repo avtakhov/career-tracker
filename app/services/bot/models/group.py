@@ -9,3 +9,6 @@ class Group(Base):
 
     group_name = sqla.Column(sqla.String, nullable=False, primary_key=True)
     users = relationship("User", secondary='users_groups')
+
+    def __str__(self):
+        return self.group_name

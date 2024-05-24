@@ -8,6 +8,7 @@ from telegram.ext import ContextTypes
 import sqlalchemy as sqla
 
 from app.core.db.base import async_session
+from app.core.markdown import markdown_escape
 from .models import *
 
 
@@ -19,20 +20,21 @@ async def get_events(telegram_user_id: int, session: AsyncSession) -> typing.Ite
         .join(Chat, Chat.user_id == UsersGroups.user_id)
         .filter(Chat.telegram_user_id == telegram_user_id)
         .filter(Event.date >= sqla.func.current_date())
-        .order_by(Event.date )
+        .order_by(Event.date)
     )
     return result.all()
 
 
 def event_to_string(eg: typing.Tuple[Event, Group]):
-    event, group = eg
+    event, _ = eg
     date_str = event.date.strftime("%d\\.%m\\.%Y")
-    return f'📌*{date_str} {event.event_name}*:\n{event.description}'
+    return f'📌 {date_str} *{markdown_escape(event.event_name)}*:\n{event.description}'
 
 
 async def events(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     async with async_session() as session:
         events = await get_events(update.effective_user.id, session)
         await update.message.reply_text(
-            '\n\n'.join(map(event_to_string, events)),parse_mode=ParseMode.MARKDOWN_V2
+            '\n\n'.join(map(event_to_string, events)),
+            parse_mode=ParseMode.MARKDOWN_V2
         )

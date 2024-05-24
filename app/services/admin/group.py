@@ -15,8 +15,8 @@ from app.services.bot.models.group import Group
 
 
 class GroupForm(wtforms.Form):
-    group_name = wtforms.StringField("group_name")
-    xlsx = wtforms.FileField("xlsx")
+    group_name = wtforms.StringField("group_name", render_kw={"class": "form-control"})
+    xlsx = wtforms.FileField("xlsx", render_kw={"class": "form-control"})
 
 
 async def insert_users(values: list[dict], session: AsyncSession):
