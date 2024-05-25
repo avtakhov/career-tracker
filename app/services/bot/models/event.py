@@ -11,6 +11,7 @@ class Event(Base):
     description = sqla.Column(sqla.String, nullable=False)
     date = sqla.Column(sqla.Date, nullable=False)
     group_name = sqla.Column(sqla.String, sqla.ForeignKey('groups.group_name', ondelete="cascade"), nullable=False)
+    reward = sqla.Column(sqla.BigInteger, default=0, nullable=False)
 
     __table_args__ = (
         sqla.Index('date_index', 'date'),

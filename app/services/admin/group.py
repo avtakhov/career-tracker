@@ -59,7 +59,7 @@ class GroupAdmin(sqladmin.ModelView, model=Group):
     form = GroupForm
     form_include_pk = True
 
-    async def on_model_change(self, data, group: Group, is_created: bool, *args):
+    async def after_model_change(self, data, group: Group, is_created: bool, *args):
         xlsx: UploadFile = data.get("xlsx")
         if xlsx.size == 0:
             return

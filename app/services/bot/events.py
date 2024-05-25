@@ -28,7 +28,7 @@ async def get_events(telegram_user_id: int, session: AsyncSession) -> typing.Ite
 def event_to_string(eg: typing.Tuple[Event, Group]):
     event, _ = eg
     date_str = event.date.strftime("%d\\.%m\\.%Y")
-    return f'📌 {date_str} *{markdown_escape(event.event_name)}*:\n{event.description}'
+    return f'📌 {date_str} *{markdown_escape(event.event_name)}*:\n{markdown_escape(event.description)}'
 
 
 async def events(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

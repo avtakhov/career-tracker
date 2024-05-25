@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-12">
+<div class="card">
+    <div class="card-header">
+    <h3 class="card-title">Attendance</h3>
+    </div>
+    <div class="card-body border-bottom py-3">
+        <form method="POST" action="/admin/attendance/group/">
+            <table class="table" style="table-layout: fixed;">
+                {% for user_form in group_form.users %}
+                    <tr>
+                        <td style="word-wrap: break-word; overflow: hidden">{{ user_form.user.label(class="col-form-label") }}</td>
+                        <td>
+                            {{ user_form.user(style="height: 1.5rem; width: 1.5rem;") }}
+                            {{ user_form.user_id }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            {{ group_form.reward }}
+            {{ group_form.submit(class="mb-3 btn") }}
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

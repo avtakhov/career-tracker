@@ -8,7 +8,7 @@ from telegram.ext import ApplicationBuilder
 
 from .core.admin.auth import AdminAuth
 from .core.db.base import get_engine
-from .services.admin.config import admin_views
+from .services.admin.config import admin_views, custom_views
 from .services.bot.config import bot_handlers
 from .settings import settings
 
@@ -25,10 +25,13 @@ app = FastAPI(lifespan=lifespan)
 admin = Admin(
     app,
     get_engine(),
-    authentication_backend=AdminAuth(settings.secret_key)
+    authentication_backend=AdminAuth(settings.secret_key),
+    templates_dir="templates",
 )
 for item in admin_views:
-    admin.add_view(item)
+    admin.add_model_view(item)
+for item in custom_views:
+    admin.add_base_view(item)
 
 ptb = (
     ApplicationBuilder()
