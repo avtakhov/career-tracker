@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from wtforms.fields.simple import HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
 
+from app.core.admin.auth import get_username
 from app.core.db.base import async_session, sync_session
 from app.services.bot.models import Event, User, UsersGroups
 
@@ -114,3 +115,9 @@ class AttendanceAdmin(BaseView):
             await add_amount(user_ids, reward, session)
             await session.commit()
         return fastapi.responses.RedirectResponse(url="/admin/attendance", status_code=302)
+
+    def is_accessible(self, request: starlette.requests.Request) -> bool:
+        token = request.session.get("token")
+        if not token or get_username(token) is None:
+            raise fastapi.HTTPException(status_code=401)
+        return True
