@@ -72,8 +72,9 @@ class GroupAdmin(sqladmin.ModelView, model=Group):
         xlsx.file.close()
 
         users = [
-            {'full_name': full_name, 'telegram_username': telegram_username}
+            {'full_name': full_name.strip(), 'telegram_username': telegram_username.strip()}
             for (full_name, telegram_username) in sheet.iter_rows(min_row=2, values_only=True)
+            if full_name and telegram_username
         ]
         async with async_session() as session:
             await insert_users(users, session)

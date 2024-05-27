@@ -80,7 +80,6 @@ class AttendanceAdmin(BaseView):
                 "attendance/event_select.html.jinja",
                 context={
                     'event_form': EventForm(),
-                    'group_form': None,
                 },
             )
 
