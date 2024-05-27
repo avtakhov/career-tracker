@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from typing import Annotated
 
 import fastapi
 from fastapi import FastAPI
@@ -44,8 +45,18 @@ for handler in bot_handlers:
 
 
 @app.post("/")
-async def process_update(request: fastapi.Request):
-    req = await request.json()
-    update = Update.de_json(req, ptb.bot)
-    await ptb.process_update(update)
+async def process_update(
+        request: fastapi.Request,
+        x_telegram_bot_api_secret_token: Annotated[str, fastapi.Header()]
+):
+    if settings.webhook_secret_token != x_telegram_bot_api_secret_token:
+        raise fastapi.HTTPException(401)
+    await ptb.process_update(
+        Update.de_json(await request.json(), ptb.bot)
+    )
     return fastapi.Response(status_code=200)
+
+
+@app.get("/favicon.ico")
+async def favicon(_: fastapi.Request):
+    return fastapi.responses.FileResponse("favicon.ico")

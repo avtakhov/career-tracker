@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     telegram_token: str
     webhook_url: str
+    webhook_secret_token: str
 
     class Config:
         env_file = ".env"
