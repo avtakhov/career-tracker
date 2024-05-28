@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from sqladmin import Admin
 from telegram import Update
 from telegram.ext import ApplicationBuilder
+from fastapi.staticfiles import StaticFiles
 
 from .core.admin.auth import AdminAuth
 from .core.db.base import get_engine
@@ -22,6 +23,7 @@ async def lifespan(_: FastAPI):
         await ptb.stop()
 
 app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 admin = Admin(
     app,

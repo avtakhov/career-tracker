@@ -10,8 +10,8 @@
             <table class="table" style="table-layout: fixed;">
                 {% for user_form in group_form.users %}
                     <tr>
-                        <td style="word-wrap: break-word; overflow: hidden">{{ user_form.user.label(class="col-form-label") }}</td>
-                        <td>
+                        <th style="word-wrap: break-word; overflow: hidden">{{ user_form.user.label(class="col-form-label") }}</th>
+                        <td class="align-middle">
                             {{ user_form.user(style="height: 1.5rem; width: 1.5rem;") }}
                             {{ user_form.user_id }}
                         </td>
