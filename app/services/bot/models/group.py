@@ -2,7 +2,6 @@ import sqlalchemy as sqla
 from sqlalchemy.orm import relationship
 
 from app.core.db.base import Base
-from app.services.bot.models import User
 
 
 class Group(Base):
