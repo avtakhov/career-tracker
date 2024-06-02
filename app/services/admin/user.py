@@ -10,6 +10,7 @@ from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 import sqlalchemy as sqla
 
 from app.core.db.base import sync_session, async_session
+from app.services.admin.views.user import clear_user_groups, add_user_groups
 from app.services.bot.models import UsersGroups, Group
 from app.services.bot.models.user import User
 
@@ -58,18 +59,11 @@ class UserAdmin(sqladmin.ModelView, model=User):
             is_created: bool,
             *args,
     ) -> None:
-        values = [
-            {"user_id": user.user_id, "group_name": group_name}
-            for group_name in data.get("groups")
-        ]
+        groups = data.get("groups")
+        if not groups:
+            return
+
         async with async_session() as session:
-            await session.execute(
-                delete(UsersGroups)
-                .where(UsersGroups.user_id == user.user_id)
-            )
-            await session.execute(
-                insert(UsersGroups)
-                .values(values)
-                .on_conflict_do_nothing()
-            )
+            await clear_user_groups(user.user_id, session)
+            await add_user_groups(user.user_id, groups, session)
             await session.commit()

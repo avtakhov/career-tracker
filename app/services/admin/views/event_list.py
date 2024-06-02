@@ -6,7 +6,7 @@ from app.services.bot.models import Event
 
 class EventList:
     @staticmethod
-    def get():
+    def get_events():
         with sync_session() as session:
             result = session.execute(
                 sqla.select(Event)
@@ -15,9 +15,8 @@ class EventList:
 
     @staticmethod
     def get_pk(event: Event):
-        return event.group_name
+        return event.event_id
 
     @staticmethod
     def get_label(event: Event):
-        date_str = event.date.strftime('%d.%m.%Y')
-        return f"{event.event_name} | {date_str} | {event.group_name}"
+        return f"{event.event_name} | {event.date.strftime('%d.%m.%Y')} | {event.group_name}"

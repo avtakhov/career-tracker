@@ -1,7 +1,6 @@
 import sqlalchemy as sqla
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.markdown import markdown_escape
 from app.services.bot.models import UsersGroups, User, Chat
 
 
@@ -23,3 +22,13 @@ async def get_user(telegram_user_id: int, session: AsyncSession) -> User | None:
 
     return result.scalar_one_or_none()
 
+
+async def get_user_locked(telegram_user_id: int, session: AsyncSession) -> User | None:
+    result = await session.execute(
+        sqla.select(User)
+        .with_for_update()
+        .join(Chat, Chat.user_id == User.user_id)
+        .filter(Chat.telegram_user_id == telegram_user_id)
+    )
+
+    return result.scalar_one_or_none()

@@ -18,7 +18,7 @@ class Purchase(Base):
     purchase_id = sqla.Column(sqla.BigInteger, nullable=False, primary_key=True, autoincrement=True)
     product_id = sqla.Column(
         sqla.BigInteger,
-        sqla.ForeignKey("products.product_id", ondelete="cascade"),
+        sqla.ForeignKey("products.product_id"),
         nullable=False,
     )
     user_id = sqla.Column(sqla.BigInteger, sqla.ForeignKey("users.user_id", ondelete="cascade"), nullable=False)

@@ -2,56 +2,18 @@ import io
 
 import sqladmin
 import wtforms
-import sqlalchemy as sqla
 from fastapi import UploadFile
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db.base import async_session
-from app.services.bot.models import User, UsersGroups
+from app.services.admin.views.group import insert_users, insert_users_groups
 from app.services.bot.models.group import Group
 
 
 class GroupForm(wtforms.Form):
     group_name = wtforms.StringField("group_name", render_kw={"class": "form-control"})
     xlsx = wtforms.FileField("xlsx", render_kw={"class": "form-control"})
-
-
-async def insert_users(values: list[dict], session: AsyncSession):
-    if not values:
-        return
-
-    await session.execute(
-        insert(User).values(values)
-        .on_conflict_do_nothing(
-            constraint='unique_telegram_username',
-        )
-    )
-
-
-async def insert_users_groups(
-        values: list[dict],
-        group_name: str,
-        session: AsyncSession,
-):
-    if not values:
-        return
-
-    result = await session.execute(
-        sqla.select(User.user_id)
-        .filter(
-            User.telegram_username.in_(i['telegram_username'] for i in values)
-        )
-    )
-
-    await session.execute(
-        insert(UsersGroups).values([
-            dict(group_name=group_name, user_id=user_id)
-            for user_id in result.scalars()
-        ]).on_conflict_do_nothing()
-    )
 
 
 class GroupAdmin(sqladmin.ModelView, model=Group):

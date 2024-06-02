@@ -8,26 +8,10 @@ from wtforms.fields.simple import HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from app.core.admin.auth import get_username
-from app.core.db.base import async_session, sync_session
+from app.core.db.base import async_session
+from app.services.admin.views.attendance import get_users, add_amount
+from app.services.admin.views.event_list import EventList
 from app.services.bot.models import Event, User, UsersGroups
-
-
-class EventRequest:
-    @staticmethod
-    def get_events():
-        with sync_session() as session:
-            result = session.execute(
-                sqla.select(Event)
-            )
-            return result.scalars().all()
-
-    @staticmethod
-    def get_pk(event: Event):
-        return event.event_id
-
-    @staticmethod
-    def get_label(event: Event):
-        return f"{event.event_name} | {event.date.strftime('%d.%m.%Y')} | {event.group_name}"
 
 
 class UserForm(wtforms.Form):
@@ -43,29 +27,12 @@ class GroupForm(wtforms.Form):
 
 class EventForm(wtforms.Form):
     select = QuerySelectField(
-        query_factory=EventRequest.get_events,
-        get_pk=EventRequest.get_pk,
-        get_label=EventRequest.get_label,
+        query_factory=EventList.get_events,
+        get_pk=EventList.get_pk,
+        get_label=EventList.get_label,
         render_kw={"class": "form-control"},
     )
     submit = wtforms.SubmitField(label="Choose")
-
-
-async def get_users(group_name: str, session: AsyncSession) -> list[User]:
-    result = await session.execute(
-        sqla.select(User)
-        .join(UsersGroups, onclause=UsersGroups.user_id == User.user_id)
-        .where(group_name == UsersGroups.group_name)
-    )
-    return list(result.scalars().all())
-
-
-async def add_amount(user_ids: list[int], reward: int, session: AsyncSession):
-    await session.execute(
-        sqla.update(User)
-        .where(User.user_id.in_(user_ids))
-        .values({User.amount: User.amount + reward})
-    )
 
 
 class AttendanceAdmin(BaseView):
