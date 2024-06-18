@@ -9,8 +9,16 @@ from app.services.bot.models.purchase import PurchaseStatus, Purchase
 
 
 class PurchaseAdmin(ModelView, model=Purchase):
-
+    name_plural = "Покупки"
+    icon = "fa-solid fa-cart-shopping"
     column_list = [Purchase.user, Purchase.product, Purchase.status, Purchase.created_at]
+    form_columns = [Purchase.user, Purchase.product, Purchase.status]
+    can_export = False
+    column_labels = {
+        Purchase.user: "Пользователь",
+        Purchase.product: "Сувенир",
+        Purchase.status: "Статус",
+    }
     column_searchable_list = [Purchase.status]
     form_ajax_refs = {
         "product": {

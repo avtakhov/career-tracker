@@ -36,8 +36,8 @@ class EventForm(wtforms.Form):
 
 
 class AttendanceAdmin(BaseView):
-    name = "Attendance"
-    icon = "fa-solid fa-chart-line"
+    name = "Посещаемость"
+    icon = "fa-solid fa-list-check"
 
     @expose("/attendance", methods=["GET", "POST"])
     async def attendance_page(self, request: starlette.requests.Request):

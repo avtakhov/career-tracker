@@ -1,13 +1,7 @@
-from typing import Any
-
 import sqladmin
-import wtforms
-from sqlalchemy import delete
-from sqlalchemy.dialects.postgresql import insert
-from starlette.requests import Request
 from wtforms import widgets
-from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 import sqlalchemy as sqla
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 
 from app.core.db.base import sync_session, async_session
 from app.services.admin.views.user import clear_user_groups, add_user_groups
@@ -27,43 +21,46 @@ class Groups:
 class BooleanTableField(QuerySelectMultipleField):
     widget = widgets.TableWidget()
     option_widget = widgets.CheckboxInput()
+    _formdata: set
+
+    def __init__(self, **kwargs):
+        kwargs["render_kw"] = {}
+        super().__init__(**kwargs)
 
     def process_data(self, data):
         self._formdata = set(group.group_name for group in data)
 
 
-class UserForm(wtforms.Form):
-    full_name = wtforms.StringField(render_kw={"class": "form-control"})
-    amount = wtforms.IntegerField(default=0, render_kw={"class": "form-control"})
-    telegram_username = wtforms.StringField(render_kw={"class": "form-control"})
-    groups = BooleanTableField(
-        query_factory=Groups.get_groups,
-        get_pk=lambda x: x,
-    )
-
-
 class UserAdmin(sqladmin.ModelView, model=User):
+    name_plural = "Пользователи"
+    icon = "fa-solid fa-user"
     column_list = [User.full_name, User.amount, User.telegram_username]
-    form = UserForm
+    form_columns = [User.full_name, User.amount, User.telegram_username, User.groups]
+    column_labels = {
+        User.full_name: "ФИО",
+        User.amount: "Баланс",
+        User.telegram_username: "Telegram username",
+        User.groups: "Группы",
+    }
+    can_export = False
+    form_overrides = {
+        "groups": BooleanTableField,
+    }
+    form_args = {
+        "groups": dict(query_factory=Groups.get_groups, get_pk=lambda x: x)
+    }
+    form_ajax_refs = {
+        "groups": {'fields': ('group_name',)}
+    }
     column_searchable_list = [User.full_name]
     edit_template = "user/edit.html.jinja"
     create_template = "user/create.html.jinja"
 
-    def search_placeholder(self) -> str:
-        return "ФИО"
-
-    async def after_model_change(
-            self,
-            data: dict,
-            user: User,
-            is_created: bool,
-            *args,
-    ) -> None:
+    async def after_model_change(self, data: dict, user: User, *args) -> None:
         groups = data.get("groups")
-        if not groups:
-            return
 
         async with async_session() as session:
             await clear_user_groups(user.user_id, session)
-            await add_user_groups(user.user_id, groups, session)
+            if groups:
+                await add_user_groups(user.user_id, groups, session)
             await session.commit()

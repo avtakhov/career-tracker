@@ -10,19 +10,19 @@ from app.services.bot.models import Group
 from app.services.bot.models.event import Event
 
 
-class EventForm(wtforms.Form):
-    event_name = wtforms.StringField(render_kw={"class": "form-control"})
-    description = wtforms.TextAreaField(render_kw={"class": "form-control"})
-    group_name = QuerySelectField(
-        query_factory=GroupList.get,
-        get_pk=GroupList.get_pk,
-        get_label=GroupList.get_label,
-        render_kw={"class": "form-control"},
-    )
-    reward = wtforms.IntegerField(render_kw={"class": "form-control"})
-    date = DateField(render_kw={"class": "form-control"})
-
-
 class EventAdmin(sqladmin.ModelView, model=Event):
+    icon = "fa-solid fa-calendar"
+    name_plural = "Мероприятия"
+    form_columns = [Event.event_name, Event.description, Event.group, Event.reward, Event.date]
+    column_labels = {
+        Event.event_name: "Название",
+        Event.description: "Описание",
+        Event.group: "Группа",
+        Event.reward: "Награда",
+        Event.date: "Дата",
+    }
+    can_export = False
+    form_overrides = {
+        "description": wtforms.TextAreaField,
+    }
     column_list = [Event.event_name, Event.date, Event.group_name]
-    form = EventForm

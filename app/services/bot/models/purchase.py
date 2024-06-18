@@ -22,7 +22,7 @@ class Purchase(Base):
         nullable=False,
     )
     user_id = sqla.Column(sqla.BigInteger, sqla.ForeignKey("users.user_id", ondelete="cascade"), nullable=False)
-    created_at = sqla.Column(sqla.DateTime, nullable=False)
+    created_at = sqla.Column(sqla.DateTime(timezone=True), nullable=False)
     status = sqla.Column(sqla.Enum(PurchaseStatus), nullable=False, default=PurchaseStatus.Ordered)
 
     user = relationship("User", viewonly=True)
