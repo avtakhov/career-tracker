@@ -6,10 +6,11 @@ from sqladmin import BaseView, expose
 from sqlalchemy.ext.asyncio import AsyncSession
 from wtforms.fields.simple import HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
+from starlette.background import BackgroundTask
 
 from app.core.admin.auth import get_username
 from app.core.db.base import async_session
-from app.services.admin.views.attendance import get_users, add_amount
+from app.services.admin.views.attendance import get_users, add_amount, notify_users
 from app.services.admin.views.event_list import EventList
 from app.services.bot.models import Event, User, UsersGroups
 
@@ -80,7 +81,9 @@ class AttendanceAdmin(BaseView):
         async with async_session() as session:
             await add_amount(user_ids, reward, session)
             await session.commit()
-        return fastapi.responses.RedirectResponse(url="/admin/attendance", status_code=302)
+
+        task = BackgroundTask(notify_users, user_ids=user_ids, reward=reward)
+        return fastapi.responses.RedirectResponse(url="/admin/attendance", status_code=302, background=task)
 
     def is_accessible(self, request: starlette.requests.Request) -> bool:
         token = request.session.get("token")
